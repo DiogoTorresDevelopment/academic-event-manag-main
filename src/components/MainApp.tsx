@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useKV } from "@github/spark/hooks";
 import {
     Event,
@@ -96,7 +96,6 @@ export function MainApp() {
     );
     const [activeTab, setActiveTab] = useState("dashboard");
     const [isSidebarOpen, setSidebarOpen] = useState(false);
-    const headerRef = useRef<HTMLDivElement>(null);
     const [sidebarOffset, setSidebarOffset] = useState(0);
 
     const menuItems: MenuItem[] = [
@@ -160,8 +159,10 @@ export function MainApp() {
     };
 
     useEffect(() => {
+        const getHeaderEl = () => document.getElementById("app-header");
+
         const updateOffset = () => {
-            const height = headerRef.current?.getBoundingClientRect().height ?? 0;
+            const height = getHeaderEl()?.getBoundingClientRect().height ?? 0;
             setSidebarOffset(height);
         };
 
@@ -169,19 +170,16 @@ export function MainApp() {
         window.addEventListener("resize", updateOffset);
 
         let observer: ResizeObserver | undefined;
-        let observedElement: HTMLDivElement | null = null;
-        if (typeof ResizeObserver !== "undefined") {
+        const el = getHeaderEl();
+        if (typeof ResizeObserver !== "undefined" && el) {
             observer = new ResizeObserver(updateOffset);
-            observedElement = headerRef.current;
-            if (observedElement) {
-                observer.observe(observedElement);
-            }
+            observer.observe(el);
         }
 
         return () => {
             window.removeEventListener("resize", updateOffset);
-            if (observer && observedElement) {
-                observer.unobserve(observedElement);
+            if (observer && el) {
+                observer.unobserve(el);
             }
             observer?.disconnect();
         };
@@ -271,10 +269,8 @@ export function MainApp() {
                 </div>
             </Sidebar>
 
-            <div className="flex min-h-screen flex-col">
-                <div ref={headerRef} className="relative z-50">
-                    <AppHeader />
-                </div>
+            <div className="flex min-h-screen flex-col" style={{ paddingTop: sidebarOffset }}>
+                <AppHeader />
 
                 <div className="flex flex-1 flex-col lg:pl-64">
                     <main className="flex-1 px-4 py-6 lg:px-8">

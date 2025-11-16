@@ -6,7 +6,7 @@ export function AppHeader() {
   const { user } = useAuth();
 
   return (
-    <header className="border-b bg-card">
+    <header id="app-header" className="fixed inset-x-0 top-0 z-50 border-b bg-card">
       <div className="flex w-full items-center justify-between px-6 py-4">
         <div className="flex items-center gap-3">
           <div className="rounded-lg bg-primary p-2 text-primary-foreground">
